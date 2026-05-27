@@ -461,7 +461,8 @@ fn find_antigravity_windows_exe(root: &Path) -> Option<PathBuf> {
 fn read_antigravity_windows_exe_metadata(root: &Path) -> Option<AntigravityInstalledVersionInfo> {
     let exe_path = find_antigravity_windows_exe(root)?;
     let script = r#"
-$p = $args[0]
+& {
+param([string]$p)
 if (-not (Test-Path -LiteralPath $p)) { exit 2 }
 $v = (Get-Item -LiteralPath $p).VersionInfo
 [Console]::OutputEncoding = [System.Text.Encoding]::UTF8
@@ -470,6 +471,7 @@ $v = (Get-Item -LiteralPath $p).VersionInfo
   ProductVersion = $v.ProductVersion
   FileVersion = $v.FileVersion
 } | ConvertTo-Json -Compress
+}
 "#;
     let mut command = std::process::Command::new("powershell");
     {
